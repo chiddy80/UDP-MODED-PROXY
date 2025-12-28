@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Script: udpc-installer.sh
+# Script: moded-udp.sh
 # Purpose: Install UDP Custom binary for ARM64 with optimization
-# Credit: ePro Dev. Team
-# Author: voltsshx
+# Credit: Esimfreegb
+# Author: Esimfreegb
 
 # clear screen
 clear
@@ -11,7 +11,7 @@ clear
 # Define variables
 INSTALL_DIR="/root/udp"
 BINARY_NAME="udp-custom"
-BINARY_URL="https://raw.githubusercontent.com/prjkt-nv404/UDP-Custom-Installer-arm64/main/udpc-arm64"
+BINARY_URL="https://raw.githubusercontent.com/chiddy80/UDP-MODED-PROXY/main/moded-udp-arm64"
 BINARY_PATH="$INSTALL_DIR/$BINARY_NAME"
 CONFIG_DIR="/etc/udp"
 CONFIG_FILE="$CONFIG_DIR/config.json"
