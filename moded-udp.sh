@@ -11,7 +11,7 @@ clear
 # Define variables
 INSTALL_DIR="/root/udp"
 BINARY_NAME="udp-custom"
-BINARY_URL="https://raw.githubusercontent.com/chiddy80/UDP-MODED-PROXY/main/moded-udp-arm64"
+BINARY_URL="https://raw.githubusercontent.com/chiddy80/UDP-MODED-PROXY/main/udp-custom-linux-amd64"
 BINARY_PATH="$INSTALL_DIR/$BINARY_NAME"
 CONFIG_DIR="/etc/udp"
 CONFIG_FILE="$CONFIG_DIR/config.json"
