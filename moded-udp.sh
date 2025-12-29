@@ -20,7 +20,7 @@ SERVICE_FILE="/etc/systemd/system/udp-custom.service"
 # Help function
 display_help() {
   clear
-  echo "Install UDP Custom binary for ARM64 with optimization."
+  echo "Install UDP Custom binary for Amd64 with optimization."
   echo "Author: voltsshx"
   echo "Credit: ePro Dev. Team"
   echo ""
