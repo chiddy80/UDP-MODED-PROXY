@@ -958,6 +958,126 @@ The script automatically:
 · Creates startup scripts
 · Sets up firewall rules
 · Installs monitoring tools
+cat > fix-udp-service.sh << 'EOF'
+#!/bin/bash
+
+echo "=== Fixing UDP Service ==="
+
+# 1. Stop any existing service
+systemctl stop udp-boost 2>/dev/null
+
+# 2. Create a simple systemd service file
+cat > /etc/systemd/system/udp-boost.service << 'SERVICE'
+[Unit]
+Description=UDP Boost Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/udp
+ExecStart=/root/udp/udp-custom server --config /etc/udp/config.json
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=udp-boost
+
+# Security
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+# 3. Reload systemd
+systemctl daemon-reload
+
+# 4. Start the service
+systemctl start udp-boost
+systemctl enable udp-boost
+
+# 5. Check status
+echo ""
+echo "=== Service Status ==="
+systemctl status udp-boost --no-pager
+
+# 6. Check logs
+echo ""
+echo "=== Recent Logs ==="
+journalctl -u udp-boost -n 10 --no-pager
+
+# 7. Check if it's listening
+echo ""
+echo "=== Listening Ports ==="
+sleep 2
+ss -tulpn | grep :36712 || echo "Port 36712 not listening yet"
+
+# 8. Create management script
+cat > /usr/local/bin/udpctl << 'MANAGE'
+#!/bin/bash
+
+case "\$1" in
+    start)
+        systemctl start udp-boost
+        echo "UDP service started"
+        ;;
+    stop)
+        systemctl stop udp-boost
+        echo "UDP service stopped"
+        ;;
+    restart)
+        systemctl restart udp-boost
+        echo "UDP service restarted"
+        ;;
+    status)
+        systemctl status udp-boost --no-pager
+        ;;
+    logs)
+        if [ "\$2" = "-f" ]; then
+            journalctl -u udp-boost -f
+        else
+            journalctl -u udp-boost -n 50 --no-pager
+        fi
+        ;;
+    config)
+        nano /etc/udp/config.json
+        ;;
+    test)
+        echo "Testing UDP port 36712..."
+        timeout 2 nc -zu 127.0.0.1 36712 && echo "✓ Port is open" || echo "✗ Port may be closed"
+        ;;
+    *)
+        echo "Usage: udpctl {start|stop|restart|status|logs|config|test}"
+        echo ""
+        echo "Examples:"
+        echo "  udpctl start      # Start UDP service"
+        echo "  udpctl status     # Check status"
+        echo "  udpctl logs -f    # Follow logs in real-time"
+        echo "  udpctl test       # Test if port is open"
+        ;;
+esac
+MANAGE
+
+chmod +x /usr/local/bin/udpctl
+
+echo ""
+echo "=== Fix Complete ==="
+echo ""
+echo "Management commands:"
+echo "  udpctl start      # Start service"
+echo "  udpctl status     # Check status"
+echo "  udpctl logs -f    # View live logs"
+echo "  udpctl test       # Test connection"
+echo ""
+echo "Manual start:"
+echo "  /root/udp/udp-custom server --config /etc/udp/config.json"
+EOF
+
+# Make it executable and run it
+chmod +x fix-udp-service.sh
+./fix-udp-service.sh
 
 7. Usage Examples:
 
